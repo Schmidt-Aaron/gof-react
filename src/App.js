@@ -32,23 +32,18 @@ class App extends Component {
 }
 
 class Grid extends Component {
-  // constructor(props) {
-  //   super(props);
-
-  //   this.state =  {
-  //     gridX,
-  //     gridY,
-  
-  //   }
-  
-  // }
   
   render() {
-    //const  { gridX, gridY } = this.props;   
-    
+    const  { gridX, gridY } = this.props;   
+    const width = gridX * 18;
+    let gridArr = [];
+
     return (
-      <div className="grid">
-        insert grid here
+      <div 
+        className="grid"
+        style={{ width: width }}
+      >
+        insert grid here {gridX}
       </div>
     )
   }
