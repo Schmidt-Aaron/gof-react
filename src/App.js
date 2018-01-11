@@ -4,11 +4,12 @@ import './App.css';
 class App extends Component {
   constructor(props) {
     super(props);
-    this.gridX = 50;
-    this.gridY = 30;
+    
 
     this.state =  {
-      generations: 0,
+      generations: 5,
+      gridX: 50,
+      gridY: 30,
     }
     //if adding functions follow this template
     //this.functionName = this.functionName.bind(this);
@@ -16,19 +17,29 @@ class App extends Component {
     //then add function here, or inside applicable component
   
   render() {
+    const { 
+      gridX, 
+      gridY, 
+      generations, 
+    } = this.state;
+
     return (
       <div className="App">
-        <header className="App-header">
+        <header>
           <h1 className="App-title">Conway's Game of Life</h1>
         </header>
         <Grid
-          rows={this.gridX}
-          cols={this.gridY} 
+          gridX={gridX}
+          gridY={gridY} 
         />
-        <h2> Generation: {this.state.generations}</h2>
+        <h2> Generation: {generations}</h2>
       </div>
     );
   }
+}
+
+class Box extends Component {
+
 }
 
 class Grid extends Component {
@@ -38,12 +49,21 @@ class Grid extends Component {
     const width = gridX * 18;
     let gridArr = [];
 
+    for ( let i = 0; i < gridX; i++ ) {
+      for( let j = 0; j < gridY; j++ ){
+        let cellID = `${i}_${j}`;
+        gridArr.push(
+          <span id={cellID} key={cellID} className="box"></span>
+        )
+      }
+    }
+
     return (
       <div 
         className="grid"
-        style={{ width: width }}
+        // style={{ width: width }}
       >
-        insert grid here {gridX}
+        {gridArr}
       </div>
     )
   }
