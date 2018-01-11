@@ -7,7 +7,7 @@ class App extends Component {
     
 
     this.state =  {
-      generations: 5,
+      generations: 0,
       gridX: 50,
       gridY: 30,
     }
@@ -39,21 +39,42 @@ class App extends Component {
 }
 
 class Box extends Component {
+  render(){
+    const {
+      xPos,
+      yPos,
+      cellID,
+    } = this.props;
+
+    return ( 
+      <div
+        id={cellID}
+        className="box"
+        xpos={xPos}
+        ypos={yPos}
+      />
+    );
+  }
 
 }
 
 class Grid extends Component {
-  
   render() {
     const  { gridX, gridY } = this.props;   
-    const width = gridX * 18;
+    const width = gridX * 10;
     let gridArr = [];
 
-    for ( let i = 0; i < gridX; i++ ) {
-      for( let j = 0; j < gridY; j++ ){
+    for ( let i = 0; i < gridY; i++ ) {
+      for( let j = 0; j < gridX; j++ ){
         let cellID = `${i}_${j}`;
+        
         gridArr.push(
-          <span id={cellID} key={cellID} className="box"></span>
+          <Box
+            key={cellID}
+            cellID={cellID}  
+            xPos={i}
+            yPos={j}
+          />
         )
       }
     }
@@ -61,11 +82,11 @@ class Grid extends Component {
     return (
       <div 
         className="grid"
-        // style={{ width: width }}
+        style={{width: width}}
       >
         {gridArr}
       </div>
-    )
+    );
   }
 }
 
