@@ -21,6 +21,11 @@
 
 /* Start Css */
 
+.grid {
+  line-height: 0;
+  font-size: 0;
+  
+}
 .box {
   display: inline-block;
   height:11px;

@@ -13,8 +13,9 @@ class App extends Component {
     }
     //if adding functions follow this template
     //this.functionName = this.functionName.bind(this);
+
   }
-    //then add function here, or inside applicable component
+  //then add function here, or inside applicable component
   
   render() {
     const { 
@@ -22,7 +23,7 @@ class App extends Component {
       gridY, 
       generations, 
     } = this.state;
-
+    
     return (
       <div className="App">
         <header>
@@ -31,7 +32,7 @@ class App extends Component {
         <Grid
           gridX={gridX}
           gridY={gridY} 
-        />
+          />
         <h2> Generation: {generations}</h2>
       </div>
     );
@@ -39,7 +40,17 @@ class App extends Component {
 }
 
 class Box extends Component {
+  constructor(props) {
+    super(props);
+    this.selectCell = this.selectCell.bind(this);
+  }
+  
+  selectCell() {
+    console.log(this);
+  }
+
   render(){
+
     const {
       xPos,
       yPos,
@@ -52,6 +63,7 @@ class Box extends Component {
         className="box"
         xpos={xPos}
         ypos={yPos}
+        onClick={ () => this.selectCell() }
       />
     );
   }
