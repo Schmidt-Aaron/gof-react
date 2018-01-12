@@ -1,15 +1,25 @@
 import React, { Component } from 'react';
 import './App.css';
 
+//helper functions
+const makeArray = (cols, rows, blank) => {
+  /** 
+   * @blank should a bolean
+   * will fill the array with 0 values if set to true  
+  **/
 
-const makeArray = (cols, rows) => {
   let arr = new Array(cols);
   for (let i = 0; i < arr.length; i++) {
-    arr[i] = new Array(rows)
+    !blank ? arr[i] = new Array(rows) : arr[i] = new Array(rows).fill(0);
   }
   return arr;
 }
 
+// const blankArr = (arr) => {
+//   for(let i = 0; i < arr.length; i++) {
+//     arr[i].fill(0);
+//   } 
+// }
 
 class App extends Component {
   constructor(props) {
@@ -17,26 +27,40 @@ class App extends Component {
     
 
     this.state =  {
-      generations: 0,
+      generation: 0,
       isRunning: false,
+      grid: [],
+      next: [],
     }
 
     //if adding functions follow this template
     //this.functionName = this.functionName.bind(this);
     this.incrementGeneration = this.incrementGeneration.bind(this);
-    this.randomGrid = this.randomGrid.bind(this);
+    //this.randomGrid = this.randomGrid.bind(this);
   }
   //then add function here, or inside applicable component
-  
+  //component functions
   incrementGeneration() {
    this.setState( (prevState) => ({
-     generations: prevState.generations + 1,
+     generation: prevState.generation + 1,
    })) 
+  }
+
+  // 1. setup initial grid here
+  // 2. update state.grid with initial grid
+  // 3. pass state to canvasGrid Component
+
+  componentDidMount() {
+    if(this.state.grid.length === 0) {
+      this.setState( (prevState) => ({
+        grid: makeArray(30, 20, true)
+      }))
+    }
   }
 
   render() {
     const { 
-      generations, 
+      generation, 
       grid,
     } = this.state;
     
@@ -49,8 +73,10 @@ class App extends Component {
           gridX={gridX}
           gridY={gridY} 
           /> */}
-          <CanvasGrid />
-        <h2> Generation: {generations}</h2>
+          <CanvasGrid 
+          grid={grid}
+          />
+        <h2> Generation: {generation}</h2>
         <button 
           onClick={() => this.incrementGeneration()}
           className="button"
@@ -65,24 +91,41 @@ class App extends Component {
 class CanvasGrid extends Component {
   constructor(props) {
     super(props);
-
-    this.state ={
-
-    }
+    this.state = {
+      grid: this.props.grid,
+    };
   }
 
   componentDidMount() {
+    this.draw();
+  }
+  
+
+  
+  draw() {
     const canvas = this.refs.canvas;
     const ctx = canvas.getContext("2d");
-    ctx.fillStyle = "#eee";
-    ctx.fillRect(0, 0, 50, 50);
+    const gridToRender = this.props.grid;
+    console.log(this.props);
+    const resolution = 10;
+    ctx.fillStyle = "red";
+    
+    for(var i = 0; i < gridToRender.length; i++)
+    for(var j = 0; j < gridToRender[i].length; j++) {
+      ctx.fillRect(i * resolution, j * resolution, resolution, resolution);
+      
+    }
+
   }
   
   render() {
+
     return (
       <canvas 
       id="grid" 
       className="grid"
+      height={400}
+      width={600}
       style={{border: 'solid 5pt orange'}}
       ref="canvas"
       >
