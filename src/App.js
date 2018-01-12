@@ -29,8 +29,6 @@ class App extends Component {
     this.state =  {
       generation: 0,
       isRunning: false,
-      grid: [],
-      next: [],
     }
 
     //if adding functions follow this template
@@ -49,20 +47,12 @@ class App extends Component {
   // 1. setup initial grid here
   // 2. update state.grid with initial grid
   // 3. pass state to canvasGrid Component
-
-  componentDidMount() {
-    if(this.state.grid.length === 0) {
-      this.setState( (prevState) => ({
-        grid: makeArray(30, 20, true)
-      }))
-    }
-  }
-
+  
   render() {
     const { 
       generation, 
-      grid,
     } = this.state;
+    
     
     return (
       <div className="App">
@@ -72,15 +62,14 @@ class App extends Component {
         {/* <Grid
           gridX={gridX}
           gridY={gridY} 
-          /> */}
+        /> */}
           <CanvasGrid 
-          grid={grid}
           />
         <h2> Generation: {generation}</h2>
         <button 
           onClick={() => this.incrementGeneration()}
           className="button"
-        >
+          >
         Next Gen
         </button>
       </div>
@@ -92,34 +81,56 @@ class CanvasGrid extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      grid: this.props.grid,
+      grid: [],
+      next: [],
     };
-  }
-
-  componentDidMount() {
-    this.draw();
-  }
-  
-
-  
-  draw() {
-    const canvas = this.refs.canvas;
-    const ctx = canvas.getContext("2d");
-    const gridToRender = this.props.grid;
-    console.log(this.props);
-    const resolution = 10;
-    ctx.fillStyle = "red";
     
-    for(var i = 0; i < gridToRender.length; i++)
-    for(var j = 0; j < gridToRender[i].length; j++) {
-      ctx.fillRect(i * resolution, j * resolution, resolution, resolution);
-      
-    }
+    this.blankGrid = this.blankGrid.bind(this);
+    console.log(this.props.grid)
+    
+  }
 
+  blankGrid() {
+    if(this.state.grid.length === 0) {
+      this.setState( (prevState) => ({
+        grid: makeArray(30, 20, true)
+      }))
+    }
   }
   
-  render() {
+  
+  componentDidMount() {
+    // const grid = this.state.grid;
+    console.log(this.state);
+    const draw = (gridArray) => {
+      const canvas = this.refs.canvas;
+      const ctx = canvas.getContext("2d");
+      //console.log(this);
+      const resolution = 20;
+      ctx.fillStyle = "#eee";
+      for(var i = 0; i < gridArray.length; i++) {
+        for(var j = 0; j < gridArray[i].length; j++) {
+          let y = j * resolution;
+          let x = i * resolution;
+          ctx.fillRect(x, y, resolution, resolution);
+          ctx.moveTo(x, y);
+          ctx.lineTo(x + resolution , y);
+          ctx.lineTo(x + resolution, y + resolution);
+          ctx.lineTo(x, y + resolution);
+          ctx.lineTo(x, y);
+          ctx.strokeStyle="red";
+          ctx.strokeStyle = "black";
+          ctx.stroke();
+          
+        }
+      }
+    }  
+    
+    draw(makeArray(30, 20, true));
+  }
 
+  render() { 
+    this.blankGrid();   
     return (
       <canvas 
       id="grid" 
@@ -132,12 +143,13 @@ class CanvasGrid extends Component {
       Oh noes... the grid isn't loading
       </canvas>
     
-    );
-  }
+  );
+  
 }
 
+
 // class Box extends Component {
-//   constructor(props) {
+  //   constructor(props) {
 //     super(props);
 
 //     this.state = { alive: false };
@@ -204,6 +216,6 @@ class CanvasGrid extends Component {
 //     );
 //   }
 // }
-
+}
 
 export default App;
