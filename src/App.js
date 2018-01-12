@@ -42,11 +42,16 @@ class App extends Component {
 class Box extends Component {
   constructor(props) {
     super(props);
+
+    this.state = { alive: false };
+
     this.selectCell = this.selectCell.bind(this);
   }
   
   selectCell() {
-    console.log(this);
+    this.state.alive 
+    ? this.setState({ alive: false })
+    : this.setState({ alive: true })
   }
 
   render(){
@@ -55,12 +60,13 @@ class Box extends Component {
       xPos,
       yPos,
       cellID,
+      alive,
     } = this.props;
 
     return ( 
       <div
         id={cellID}
-        className="box"
+        className={ this.state.alive ? "box on" : "box"}
         xpos={xPos}
         ypos={yPos}
         onClick={ () => this.selectCell() }
