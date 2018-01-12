@@ -10,13 +10,20 @@ class App extends Component {
       generations: 0,
       gridX: 50,
       gridY: 30,
+      isRunning: false,
     }
+
     //if adding functions follow this template
     //this.functionName = this.functionName.bind(this);
+    this.incrementGeneration = this.incrementGeneration.bind(this);
 
   }
   //then add function here, or inside applicable component
   
+  incrementGeneration() {
+    if (this.state.isRunning) this.state.generations += 1; 
+  }
+
   render() {
     const { 
       gridX, 
@@ -34,6 +41,12 @@ class App extends Component {
           gridY={gridY} 
           />
         <h2> Generation: {generations}</h2>
+        <button 
+          onClick={() => incrementGeneration()}
+          className="button"
+        >
+        Next Gen
+        </button>
       </div>
     );
   }
@@ -79,7 +92,7 @@ class Box extends Component {
 class Grid extends Component {
   render() {
     const  { gridX, gridY } = this.props;   
-    const width = gridX * 10;
+    const width = gridX * 14;
     let gridArr = [];
 
     for ( let i = 0; i < gridY; i++ ) {

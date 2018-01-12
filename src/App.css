@@ -24,12 +24,12 @@
 .grid {
   line-height: 0;
   font-size: 0;
-  
+
 }
 .box {
   display: inline-block;
-  height:11px;
-  width:11px;
+  height:15px;
+  width:15px;
   box-sizing: border-box;
   border: 1px solid black;
   padding: 0;
