@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import './App.css';
 
 //helper functions
-const makeArray = (cols, rows, blank) => {
+const makeArray = (cols, rows, random) => {
   /** 
    * @blank should a bolean
    * will fill the array with 0 values if set to true  
@@ -10,22 +10,32 @@ const makeArray = (cols, rows, blank) => {
 
   let arr = new Array(cols);
   for (let i = 0; i < arr.length; i++) {
-    !blank ? arr[i] = new Array(rows) : arr[i] = new Array(rows).fill(0);
+    arr[i] = new Array(rows);
+    for (let j = 0; j < arr.length; j++ ){
+      !random 
+        ? arr[i][j] = 0
+        : arr[i][j] = ( Math.round( Math.random() )); 
+    }
   }
   return arr;
 }
 
-// const blankArr = (arr) => {
-//   for(let i = 0; i < arr.length; i++) {
-//     arr[i].fill(0);
-//   } 
+// const randArray = (cols, rows) => {
+//   let arr = [];
+
+//   for(var i = 0; i < arr.cols; i++) {
+//     for(var j = 0; j < arr[i].rows; j++) {
+//     arr[i][j] = Math.round(Math.random());
+//     }
+//   }
+
+//   return arr;
 // }
 
 class App extends Component {
   constructor(props) {
     super(props);
     
-
     this.state =  {
       generation: 0,
       isRunning: false,
@@ -70,6 +80,12 @@ class App extends Component {
           onClick={() => this.incrementGeneration()}
           className="button"
           >
+        Random
+        </button>
+        <button 
+          onClick={() => this.incrementGeneration()}
+          className="button"
+          >
         Next Gen
         </button>
       </div>
@@ -83,15 +99,16 @@ class CanvasGrid extends Component {
     this.state = {
       grid: [],
       next: [],
+      resolution: 20,
+
     };
     
     this.blankGrid = this.blankGrid.bind(this);
-    console.log(this.props.grid)
     
   }
 
   blankGrid() {
-    if(this.state.grid.length === 0) {
+    if(this.state.length === 0) {
       this.setState( (prevState) => ({
         grid: makeArray(30, 20, true)
       }))
@@ -99,34 +116,40 @@ class CanvasGrid extends Component {
   }
   
   
-  componentDidMount() {
-    // const grid = this.state.grid;
-    console.log(this.state);
-    const draw = (gridArray) => {
-      const canvas = this.refs.canvas;
-      const ctx = canvas.getContext("2d");
-      //console.log(this);
-      const resolution = 20;
-      ctx.fillStyle = "#eee";
-      for(var i = 0; i < gridArray.length; i++) {
-        for(var j = 0; j < gridArray[i].length; j++) {
-          let y = j * resolution;
-          let x = i * resolution;
+  // initRandom() {
+  //   this.setState( (prevState) => ({
+  //     grid: randArray(30, 20)
+  //   }))  
+  // }
+  
+draw(gridArray) {
+    const canvas = this.refs.canvas;
+    const ctx = canvas.getContext("2d");
+
+    const resolution = this.state.resolution;
+    ctx.fillStyle = "red";
+    for(var i = 0; i < gridArray.length; i++) {
+      for(var j = 0; j < gridArray[i].length; j++) {
+        let y = j * resolution;
+        let x = i * resolution;
+
+        if(gridArray[i][j] === 1 ){
           ctx.fillRect(x, y, resolution, resolution);
-          ctx.moveTo(x, y);
-          ctx.lineTo(x + resolution , y);
-          ctx.lineTo(x + resolution, y + resolution);
-          ctx.lineTo(x, y + resolution);
-          ctx.lineTo(x, y);
-          ctx.strokeStyle="red";
-          ctx.strokeStyle = "black";
-          ctx.stroke();
-          
         }
+        
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + resolution , y);
+        ctx.lineTo(x + resolution, y + resolution);
+        ctx.lineTo(x, y + resolution);
+        ctx.lineTo(x, y);
+        ctx.strokeStyle = "black";
+        ctx.stroke();    
       }
-    }  
-    
-    draw(makeArray(30, 20, true));
+    }
+  } 
+
+  componentDidMount() {
+    this.draw(makeArray(30, 20, true));
   }
 
   render() { 
