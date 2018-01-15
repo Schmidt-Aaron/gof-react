@@ -41,21 +41,72 @@ class App extends Component {
   }
   //then add function here, or inside applicable component
   //component functions
+  
+  // next generation
+  // add rerender function call once completed 
   incrementGeneration() {
+    let nextGeneration = this.createNextGenGrid(this.state.gridArray);
+// console.log(this.state.gridArray)
    this.setState( (prevState) => ({
      generation: prevState.generation + 1,
+     gridArray: nextGeneration,
    })) 
   }
 
+  // calculate the neighbors helpful function
+  // give it the grid and the x + y coordinates
+  // returns interger 0-8
+  calculateNeighbors(gridArr, x, y) {
+    let sum = 0;
+    let cols = 30;
+    let rows = 20;
+    for (let i = -1; i < 2; i++) {
+      for(let j = -1; j < 2; j++) {
+        let col = (x + i + cols) % cols;
+        let row = (y + j + rows) % rows;
+        sum += gridArr[col][row]
+      }
+    }
+
+    sum -= gridArr[x][y]
+    return sum;
+  }
+
+  // function that returns next generation gridArray
+  // input gridArray
+  // returns new grid
+  createNextGenGrid(gridArr) {
+    console.log(gridArr);
+    let next = gridArr;
+    for(let i = 0; i < gridArr.length; i++){
+      for(let j = 0; j < gridArr.length; j++){
+        let cell = gridArr[i][j];
+        let neighbors = this.calculateNeighbors(gridArr, i, j);
+
+        if(cell === 0 && neighbors === 3) {
+          next[i][j] = 1;
+        } else if (cell === 1 && (neighbors < 2 || neighbors > 3)) {
+          next[i][j] = 0;
+        } else {
+          next[i][j] = cell;
+        }
+      }
+    }
+
+    return next;
+  }
+
+  //creates new gridArray filled with 0's
   blankGrid() {
     this.setState( (prevState) => ({
-      gridArray: makeArray(30, 20)
+      gridArray: makeArray(30, 20),
     }))
   }
   
+  //creates a new random gridArray
   randomGrid() {
     this.setState( (prevState) => ({
-      gridArray: makeArray(30, 20, true)
+      gridArray: makeArray(30, 20, true),
     }))
   }
   
