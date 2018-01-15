@@ -5,7 +5,7 @@ import './App.css';
 const makeArray = (cols, rows, random) => {
   /** 
    * @blank should a bolean
-   * will fill the array with 0 values if set to true  
+   * will fill the array with either 0 or 1  if set to true  
   **/
 
   let arr = new Array(cols);
@@ -20,18 +20,6 @@ const makeArray = (cols, rows, random) => {
   return arr;
 }
 
-// const randArray = (cols, rows) => {
-//   let arr = [];
-
-//   for(var i = 0; i < arr.cols; i++) {
-//     for(var j = 0; j < arr[i].rows; j++) {
-//     arr[i][j] = Math.round(Math.random());
-//     }
-//   }
-
-//   return arr;
-// }
-
 class App extends Component {
   constructor(props) {
     super(props);
@@ -39,11 +27,16 @@ class App extends Component {
     this.state =  {
       generation: 0,
       isRunning: false,
-    }
+      gridArray: [],
+      resolution: 20,
 
+    }
+    
     //if adding functions follow this template
     //this.functionName = this.functionName.bind(this);
     this.incrementGeneration = this.incrementGeneration.bind(this);
+    this.blankGrid = this.blankGrid.bind(this);
+    this.randomGrid = this.randomGrid.bind(this);
     //this.randomGrid = this.randomGrid.bind(this);
   }
   //then add function here, or inside applicable component
@@ -54,33 +47,53 @@ class App extends Component {
    })) 
   }
 
+  blankGrid() {
+    this.setState( (prevState) => ({
+      gridArray: makeArray(30, 20)
+    }))
+  }
+  
+  randomGrid() {
+    this.setState( (prevState) => ({
+      gridArray: makeArray(30, 20, true)
+    }))
+  }
+  
   // 1. setup initial grid here
   // 2. update state.grid with initial grid
   // 3. pass state to canvasGrid Component
   
   render() {
+    if(this.state.gridArray.length === 0) {
+      this.blankGrid();
+    }
     const { 
-      generation, 
+      generation,
+      gridArray,
+      resolution, 
     } = this.state;
-    
     
     return (
       <div className="App">
         <header>
           <h1 className="App-title">Conway's Game of Life</h1>
         </header>
-        {/* <Grid
-          gridX={gridX}
-          gridY={gridY} 
-        /> */}
-          <CanvasGrid 
+          <CanvasGrid
+            resolution={resolution}
+            gridArray={gridArray} 
           />
         <h2> Generation: {generation}</h2>
         <button 
-          onClick={() => this.incrementGeneration()}
+          onClick={() => this.randomGrid()}
           className="button"
           >
         Random
+        </button>
+        <button 
+          onClick={() => this.blankGrid()}
+          className="button"
+          >
+        Blank
         </button>
         <button 
           onClick={() => this.incrementGeneration()}
@@ -97,37 +110,30 @@ class CanvasGrid extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      grid: [],
-      next: [],
-      resolution: 20,
-
+      grid: this.props.gridArray,
+      resolution: this.props.resolution,
     };
-    
-    this.blankGrid = this.blankGrid.bind(this);
-    
   }
 
-  blankGrid() {
-    if(this.state.length === 0) {
-      this.setState( (prevState) => ({
-        grid: makeArray(30, 20, true)
-      }))
-    }
+  makeCanvas(width = 600, height = 400) {
+    let el = document.createElement("canvas");
+    el.id = "grid";
+    el.setAttribute("className", "grid");
+    el.setAttribute("height", height);
+    el.setAttribute("width", width);
+    el.setAttribute("ref", "canvas");
+    el.setAttribute("style", "border: 'solid 5pt #673ab7'");
+    console.log(el);
+    document.getElementById("canvasDiv").appendChild(el);
   }
   
-  
-  // initRandom() {
-  //   this.setState( (prevState) => ({
-  //     grid: randArray(30, 20)
-  //   }))  
-  // }
-  
-draw(gridArray) {
+  draw(gridArray) {
     const canvas = this.refs.canvas;
     const ctx = canvas.getContext("2d");
 
     const resolution = this.state.resolution;
-    ctx.fillStyle = "red";
+    ctx.clearRect(0, 0, 600, 400);
+    ctx.fillStyle = "#4caf50";
     for(var i = 0; i < gridArray.length; i++) {
       for(var j = 0; j < gridArray[i].length; j++) {
         let y = j * resolution;
@@ -148,27 +154,43 @@ draw(gridArray) {
     }
   } 
 
+
   componentDidMount() {
-    this.draw(makeArray(30, 20, true));
+    // this.draw(makeArray(30, 20, true)); /* draws a new random grid */
+    //this.draw(this.props.gridArray)
+    //console.log("componentDidMount")
+    //console.log("props at didMount" + this.props.gridArray); 
+    //this.makeCanvas();
+  }
+  
+  componentDidUpdate() {
+    if(this.props.gridArray) {
+      this.draw(this.props.gridArray)
+    }   
   }
 
-  render() { 
-    this.blankGrid();   
+  render() {
+    console.log("render call"); 
+    //console.log("props at render" + this.props.gridArray); 
+    //console.log(this.props.gridArray)
     return (
+
+    // <div ref="canvasDiv">
+    // {/* insert our canvas here */}
+    // </div>
       <canvas 
       id="grid" 
       className="grid"
       height={400}
       width={600}
-      style={{border: 'solid 5pt orange'}}
+      style={{border: 'solid 5pt #673ab7'}}
       ref="canvas"
       >
       Oh noes... the grid isn't loading
       </canvas>
     
-  );
-  
-}
+    );
+  }
 
 
 // class Box extends Component {
