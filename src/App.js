@@ -37,6 +37,8 @@ class App extends Component {
     this.incrementGeneration = this.incrementGeneration.bind(this);
     this.blankGrid = this.blankGrid.bind(this);
     this.randomGrid = this.randomGrid.bind(this);
+    this.start = this.start.bind(this);
+    this.stop = this.stop.bind(this);
     //this.randomGrid = this.randomGrid.bind(this);
   }
   //then add function here, or inside applicable component
@@ -46,11 +48,46 @@ class App extends Component {
   // add rerender function call once completed 
   incrementGeneration() {
     let nextGeneration = this.createNextGenGrid(this.state.gridArray);
-// console.log(this.state.gridArray)
-   this.setState( (prevState) => ({
-     generation: prevState.generation + 1,
-     gridArray: nextGeneration,
+    this.setState( (prevState) => ({
+      generation: prevState.generation + 1,
+      gridArray: nextGeneration,
    })) 
+  }
+
+  //creates new gridArray filled with 0's
+  blankGrid() {
+    this.setState( (prevState) => ({
+      gridArray: makeArray(30, 20),
+      generation: 0,
+      isRunning: false,
+    }))
+  }
+  
+  //creates a new random gridArray
+  randomGrid() {
+    this.setState( (prevState) => ({
+      gridArray: makeArray(30, 20, true),
+      generation: 0,
+      isRunning: false,
+    }))
+  }
+
+  running() {
+    setInterval(console.log("interval running"));
+  } 
+
+  start() {
+    this.running()
+    this.setState( (prevState) => ({
+      isRunning: true,
+    }))
+  }
+
+  stop() {
+    clearInterval(this.running)
+    this.setState( (prevState) => ({
+      isRunning: false,
+    }))
   }
 
   // calculate the neighbors helpful function
@@ -96,19 +133,6 @@ class App extends Component {
     return next;
   }
 
-  //creates new gridArray filled with 0's
-  blankGrid() {
-    this.setState( (prevState) => ({
-      gridArray: makeArray(30, 20),
-    }))
-  }
-  
-  //creates a new random gridArray
-  randomGrid() {
-    this.setState( (prevState) => ({
-      gridArray: makeArray(30, 20, true),
-    }))
-  }
   
   // 1. setup initial grid here
   // 2. update state.grid with initial grid
@@ -116,7 +140,7 @@ class App extends Component {
   
   render() {
     if(this.state.gridArray.length === 0) {
-      this.blankGrid();
+      this.randomGrid();
     }
     const { 
       generation,
@@ -134,6 +158,18 @@ class App extends Component {
             gridArray={gridArray} 
           />
         <h2> Generation: {generation}</h2>
+        <button 
+          onClick={() => this.start()}
+          className="button"
+          >
+        Start
+        </button>
+        <button 
+          onClick={() => this.stop()}
+          className="button"
+          >
+        Stop
+        </button>
         <button 
           onClick={() => this.randomGrid()}
           className="button"
@@ -161,7 +197,6 @@ class CanvasGrid extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      grid: this.props.gridArray,
       resolution: this.props.resolution,
     };
   }
@@ -204,15 +239,6 @@ class CanvasGrid extends Component {
       }
     }
   } 
-
-
-  componentDidMount() {
-    // this.draw(makeArray(30, 20, true)); /* draws a new random grid */
-    //this.draw(this.props.gridArray)
-    //console.log("componentDidMount")
-    //console.log("props at didMount" + this.props.gridArray); 
-    //this.makeCanvas();
-  }
   
   componentDidUpdate() {
     if(this.props.gridArray) {
@@ -222,13 +248,7 @@ class CanvasGrid extends Component {
 
   render() {
     console.log("render call"); 
-    //console.log("props at render" + this.props.gridArray); 
-    //console.log(this.props.gridArray)
     return (
-
-    // <div ref="canvasDiv">
-    // {/* insert our canvas here */}
-    // </div>
       <canvas 
       id="grid" 
       className="grid"
@@ -239,9 +259,11 @@ class CanvasGrid extends Component {
       >
       Oh noes... the grid isn't loading
       </canvas>
-    
     );
   }
+}
+
+export default App;
 
 
 // class Box extends Component {
@@ -312,6 +334,3 @@ class CanvasGrid extends Component {
 //     );
 //   }
 // }
-}
-
-export default App;
