@@ -37,7 +37,7 @@
   margin-bottom: -1px;
   margin-right: -1px;
 }
- .on {
+ .alive {
    background-color: green;
  }
  .off {

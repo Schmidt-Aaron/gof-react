@@ -27,8 +27,8 @@ class App extends Component {
 
     this.state = {
       generation: 0,
-      rows: 10,
-      cols: 10,
+      rows: 50,
+      cols: 50,
       gameArray: [],
       isRunning: false,
       speed: 500,
@@ -52,7 +52,6 @@ class App extends Component {
         gameArray: makeArray(this.state.cols, this.state.rows, false),
       }))
     } 
-
   }
 
   render() {
@@ -120,7 +119,7 @@ class Cell extends Component {
   render() {
     return (
       <div 
-        className="box"
+        className={this.props.alive === 1 ? "box alive" : "box"}
         alive="use props"
         key={this.props.index}
       >
