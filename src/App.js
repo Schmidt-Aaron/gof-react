@@ -54,12 +54,45 @@ class App extends Component {
   incrementGeneration() {
     this.setState( (prevState) => ({
       generation: prevState.generation += 1,
+      gameArray: this.createNextGenGrid(prevState.gameArray), 
     })) 
   }
 
-  //calculates cell neighbors and assigns the score 
-  calculateNeighbors(arr) {
-    
+  //calculates cell neighbors 
+  calculateNeighbors(gameArr, x, y) {
+    let sum = 0;
+    let cols = this.state.cols;
+    let rows = this.state.rows;
+    for (let i = -1; i < 2; i++) {
+      for(let j = -1; j < 2; j++) {
+        let col = (x + i + cols) % cols;
+        let row = (y + j + rows) % rows;
+        sum += gameArr[col][row]
+      }
+    }
+
+  sum -= gameArr[x][y]
+  return sum;
+  }
+ 
+  createNextGenGrid(gameArr) {
+    let nextGameArr = gameArr;
+    for(let i = 0; i < gameArr.length; i++){
+      for(let j = 0; j < gameArr[i].length; j++){
+        let cell = gameArr[i][j];
+        let neighbors = this.calculateNeighbors(gameArr, i, j);
+
+        if(cell === 0 && neighbors === 3) {
+          nextGameArr[i][j] = 1;
+        } else if (cell === 1 && (neighbors < 2 || neighbors > 3)) {
+          nextGameArr[i][j] = 0;
+        } else {
+          nextGameArr[i][j] = cell;
+        }
+      }
+    }
+
+    return nextGameArr;
   }
 
   componentWillMount(){
