@@ -34,21 +34,42 @@ class App extends Component {
       speed: 500,
         
     }
+      
+    //app function bindings
+    this.newRandomGrid = this.newRandomGrid.bind(this)
+  }
+
+  //app functions
+  newRandomGrid() {
+    this.setState( (prevState) => ({
+      gameArray: makeArray(this.state.cols, this.state.rows, true),
+    })) 
+  }
+
+  componentWillMount(){
+    if(this.state.gameArray.length === 0 ) {
+      this.setState( (prevState) => ({
+        gameArray: makeArray(this.state.cols, this.state.rows, false),
+      }))
+    } 
+
   }
 
   render() {
     const generation = this.state.generation;
-    this.state.gameArray = makeArray(this.state.cols, this.state.rows, false);
 
     return (
       <div className="App">
         <div className="header">
-          <h1>GOL-React</h1>
+          <h1>Conway's GoL in React</h1>
         </div>
         <Grid 
           game={this.state.gameArray}
         />
         <h2>Generation: {generation}</h2>
+        <button onClick={() => this.newRandomGrid()} >
+          Random
+        </button>
       </div>
     );
   }
@@ -58,13 +79,13 @@ class App extends Component {
 class Grid extends Component {
   render() {
     const game = this.props.game;
-    console.log(game);
     return (
       <div 
         className="grid"  
       >
       {game.map((e, i) => 
-        <Row 
+        <Row
+          key={i} 
           index={i}
           rowArray={e}
         />
@@ -77,13 +98,15 @@ class Grid extends Component {
 
 class Row extends Component {
   render() {
-    const gameArray = this.props.rowArray;
+    const rowArray = this.props.rowArray;
     const index = this.props.index;
     return (
       <div>
-        {gameArray.map((e,i) =>
-          <Cell 
+        {rowArray.map((e,i) =>
+          <Cell
+            key={`${index}_${i}`} 
             index={`${index}_${i}`}
+            alive={rowArray[i]}
           />
         )}
       </div>
