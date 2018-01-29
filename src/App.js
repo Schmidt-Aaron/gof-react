@@ -7,14 +7,14 @@ const makeArray = (cols, rows, random) => {
    * @random should a bolean
    * will fill the array with either 0 or 1  if set to true  
   **/
-
+  let density = 0.8; // modifies the density of the alive cells for initial grid.
   let arr = new Array(cols);
   for (let i = 0; i < arr.length; i++) {
     arr[i] = new Array(rows);
     for (let j = 0; j < arr.length; j++ ){
       !random 
         ? arr[i][j] = 0
-        : arr[i][j] = ( Math.round( Math.random() )); 
+        : arr[i][j] = ( Math.round( Math.random() * density )); 
     }
   }
   return arr;
@@ -36,14 +36,30 @@ class App extends Component {
     }
       
     //app function bindings
-    this.newRandomGrid = this.newRandomGrid.bind(this)
+    this.newRandomGrid = this.newRandomGrid.bind(this);
+    this.incrementGeneration = this.incrementGeneration.bind(this);
   }
 
-  //app functions
+  /**** app functions ****/
+  //startover with new random board
   newRandomGrid() {
     this.setState( (prevState) => ({
       gameArray: makeArray(this.state.cols, this.state.rows, true),
+      generation: 0,
+      isRunning: false,
     })) 
+  }
+
+  // increases generation
+  incrementGeneration() {
+    this.setState( (prevState) => ({
+      generation: prevState.generation += 1,
+    })) 
+  }
+
+  //calculates cell neighbors and assigns the score 
+  calculateNeighbors(arr) {
+    
   }
 
   componentWillMount(){
@@ -68,6 +84,9 @@ class App extends Component {
         <h2>Generation: {generation}</h2>
         <button onClick={() => this.newRandomGrid()} >
           Random
+        </button>
+        <button onClick={() => this.incrementGeneration()} >
+          Increment
         </button>
       </div>
     );
@@ -110,8 +129,6 @@ class Row extends Component {
         )}
       </div>
     );
-
-
   }
 }
 
