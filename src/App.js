@@ -95,12 +95,37 @@ class App extends Component {
     return nextGameArr;
   }
 
-  componentWillMount(){
+  startGame(){
+    this.setState( (prevState) => ({
+      isRunning: true,
+    }))
+  }
+  
+  stopGame(){
+    this.setState( (prevState) => ({
+      isRunning: false,
+    }))
+  }
+
+  componentWillMount() {
     if(this.state.gameArray.length === 0 ) {
       this.setState( (prevState) => ({
         gameArray: makeArray(this.state.cols, this.state.rows, false),
       }))
-    } 
+    }
+
+    if(this.state.isRunning === true) {
+      this.running = setInterval(
+        () => this.incrementGeneration(),
+        this.state.speed
+      ) 
+    }  
+  }
+
+  componentWillUnmount() {
+    if(this.state.isRunning === false) { 
+      clearInterval(this.running);
+    }
   }
 
   render() {
@@ -113,6 +138,7 @@ class App extends Component {
         </div>
         <Grid 
           game={this.state.gameArray}
+          running={this.state.isRunning}
         />
         <h2>Generation: {generation}</h2>
         <button onClick={() => this.newRandomGrid()} >
@@ -120,6 +146,12 @@ class App extends Component {
         </button>
         <button onClick={() => this.incrementGeneration()} >
           Increment
+        </button>
+        <button onClick={() => this.startGame()} >
+          Start
+        </button>
+        <button onClick={() => this.stopGame()} >
+          Stop
         </button>
       </div>
     );
