@@ -31,13 +31,18 @@ class App extends Component {
       cols: 50,
       gameArray: [],
       isRunning: false,
-      speed: 500,
-        
+      speed: 1500,
+      resolution: 15, //must equal cell height/width
+      running: false,
     }
       
     //app function bindings
     this.newRandomGrid = this.newRandomGrid.bind(this);
+    this.newBlankGrid = this.newBlankGrid.bind(this);
+    this.startGame = this.startGame.bind(this);
+    this.stopGame = this.stopGame.bind(this);
     this.incrementGeneration = this.incrementGeneration.bind(this);
+    this.getCoords = this.getCoords.bind(this);
   }
 
   /**** app functions ****/
@@ -50,11 +55,24 @@ class App extends Component {
     })) 
   }
 
+  //startover with blank board
+  newBlankGrid() {
+    this.setState( (prevState) => ({
+      gameArray: makeArray(this.state.cols, this.state.rows, false),
+      generation: 0,
+      isRunning: false,
+    })) 
+  }
+
   // increases generation
   incrementGeneration() {
     this.setState( (prevState) => ({
-      generation: prevState.generation += 1,
       gameArray: this.createNextGenGrid(prevState.gameArray), 
+    }), this.genCounter) 
+  }
+  genCounter(){
+    this.setState( (prevState) => ({ 
+      generation: prevState.generation += 1,
     })) 
   }
 
@@ -70,9 +88,8 @@ class App extends Component {
         sum += gameArr[col][row]
       }
     }
-
-  sum -= gameArr[x][y]
-  return sum;
+    sum -= gameArr[x][y]
+    return sum;
   }
  
   createNextGenGrid(gameArr) {
@@ -107,27 +124,46 @@ class App extends Component {
     }))
   }
 
+  getCoords(e) {
+    console.log('click');
+    // let coords = this.props.index.split('_');
+    // let x = coords[0];
+    // let y = coords[1];
+   // this.props.rowArray[y] = 1;
+
+  }
+
   componentWillMount() {
+    //creates initial grid
     if(this.state.gameArray.length === 0 ) {
       this.setState( (prevState) => ({
         gameArray: makeArray(this.state.cols, this.state.rows, false),
       }))
     }
+    // let running = setInterval(
+    //   this.incrementGeneration(), this.state.speed
+    //   );
+    
+    // if(this.state.isRunning === true && this.state.running === false) {
+    //   this.setState( (prevState) => ({
+    //     running: running,
+    //   }))
+    // }
 
-    if(this.state.isRunning === true) {
-      this.running = setInterval(
-        () => this.incrementGeneration(),
-        this.state.speed
-      ) 
-    }  
   }
-
+  
+  componentDidMount() {
+  }
+  
   componentWillUnmount() {
-    if(this.state.isRunning === false) { 
-      clearInterval(this.running);
-    }
+    // if( this.state.isRunning === false && this.state.running !== false ) { 
+    //   clearInterval(this.state.running);
+    //   this.setState( (prevState) => ({
+    //     running: false,
+    //   }))
+    // }  
   }
-
+  
   render() {
     const generation = this.state.generation;
 
@@ -139,10 +175,14 @@ class App extends Component {
         <Grid 
           game={this.state.gameArray}
           running={this.state.isRunning}
-        />
+          onClick={(e) => this.getCoords(e)}
+        />  
         <h2>Generation: {generation}</h2>
         <button onClick={() => this.newRandomGrid()} >
           Random
+        </button>
+        <button onClick={() => this.newBlankGrid()} >
+          Blank
         </button>
         <button onClick={() => this.incrementGeneration()} >
           Increment
@@ -198,6 +238,12 @@ class Row extends Component {
 }
 
 class Cell extends Component {
+  // constructor(props) {
+  //   super(props);
+
+    
+  // }
+
   render() {
     return (
       <div 
