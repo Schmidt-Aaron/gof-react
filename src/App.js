@@ -33,7 +33,7 @@ class App extends Component {
       isRunning: false,
       speed: 1500,
       resolution: 15, //must equal cell height/width
-      running: false,
+      updated: false,
     }
       
     //app function bindings
@@ -66,14 +66,15 @@ class App extends Component {
 
   // increases generation
   incrementGeneration() {
-    this.setState( (prevState) => ({
-      gameArray: this.createNextGenGrid(prevState.gameArray), 
-    }), this.genCounter) 
-  }
-  genCounter(){
-    this.setState( (prevState) => ({ 
-      generation: prevState.generation += 1,
-    })) 
+    if(this.state.updated === false) {
+      setTimeout(() => {
+        this.setState( (prevState) => ({
+          gameArray: this.createNextGenGrid(prevState.gameArray),
+          updated: true, 
+          generation: prevState.generation += 1,
+        })) 
+      }, 200)
+    }
   }
 
   //calculates cell neighbors 
@@ -116,6 +117,8 @@ class App extends Component {
     this.setState( (prevState) => ({
       isRunning: true,
     }))
+
+    this.incrementGeneration();
   }
   
   stopGame(){
@@ -140,31 +143,23 @@ class App extends Component {
         gameArray: makeArray(this.state.cols, this.state.rows, false),
       }))
     }
-    // let running = setInterval(
-    //   this.incrementGeneration(), this.state.speed
-    //   );
     
-    // if(this.state.isRunning === true && this.state.running === false) {
-    //   this.setState( (prevState) => ({
-    //     running: running,
-    //   }))
-    // }
-
   }
   
-  componentDidMount() {
+  componentDidUpdate() {
+    if(this.state.updated === true ) {
+      this.setState( (prevState) => ({
+        updated: false,
+      }))
+    }
   }
   
   componentWillUnmount() {
-    // if( this.state.isRunning === false && this.state.running !== false ) { 
-    //   clearInterval(this.state.running);
-    //   this.setState( (prevState) => ({
-    //     running: false,
-    //   }))
-    // }  
+
   }
   
   render() {
+     
     const generation = this.state.generation;
 
     return (
@@ -175,24 +170,25 @@ class App extends Component {
         <Grid 
           game={this.state.gameArray}
           running={this.state.isRunning}
-          onClick={(e) => this.getCoords(e)}
         />  
         <h2>Generation: {generation}</h2>
-        <button onClick={() => this.newRandomGrid()} >
-          Random
-        </button>
-        <button onClick={() => this.newBlankGrid()} >
-          Blank
-        </button>
-        <button onClick={() => this.incrementGeneration()} >
-          Increment
-        </button>
-        <button onClick={() => this.startGame()} >
-          Start
-        </button>
-        <button onClick={() => this.stopGame()} >
-          Stop
-        </button>
+        <div className="controls">
+          <button onClick={this.newRandomGrid} >
+            Random
+          </button>
+          <button onClick={this.newBlankGrid} >
+            Blank
+          </button>
+          <button onClick={this.incrementGeneration} >
+            Increment
+          </button>
+          <button onClick={this.startGame} >
+            Start
+          </button>
+          <button onClick={this.stopGame} >
+            Stop
+          </button>
+        </div>
       </div>
     );
   }
@@ -200,61 +196,40 @@ class App extends Component {
 
 // does this need state => change into function?
 class Grid extends Component {
+
+  
   render() {
     const game = this.props.game;
     return (
       <div 
         className="grid"  
       >
-      {game.map((e, i) => 
-        <Row
-          key={i} 
-          index={i}
-          rowArray={e}
-        />
-        )
+      {
+      game.map((e, i) => 
+        e.map((el, j) =>
+          <Box 
+            alive={game[i][j]}
+            index={`${i}_${j}`}
+          />
+        )    
+      )
       }
       </div>
     );
   }
 }
 
-class Row extends Component {
-  render() {
-    const rowArray = this.props.rowArray;
-    const index = this.props.index;
+class Box extends Component{
+  render(){
     return (
-      <div>
-        {rowArray.map((e,i) =>
-          <Cell
-            key={`${index}_${i}`} 
-            index={`${index}_${i}`}
-            alive={rowArray[i]}
-          />
-        )}
-      </div>
-    );
-  }
-}
-
-class Cell extends Component {
-  // constructor(props) {
-  //   super(props);
-
-    
-  // }
-
-  render() {
-    return (
-      <div 
+      <div
         className={this.props.alive === 1 ? "box alive" : "box"}
-        alive="use props"
         key={this.props.index}
-      >
-      cell
-      </div>
+      />
+
     );
   }
 }
+
 
 export default App;
