@@ -20,48 +20,13 @@ const makeArray = (cols, rows, random) => {
   return arr;
 }
 
-//calculates cell neighbors 
-const calculateNeighbors = (gameArr, x, y) => {
-  let sum = 0;
-  let cols = this.state.cols;
-  let rows = this.state.rows;
-  for (let i = -1; i < 2; i++) {
-    for(let j = -1; j < 2; j++) {
-      let col = (x + i + cols) % cols;
-      let row = (y + j + rows) % rows;
-      sum += gameArr[col][row]
-    }
-  }
-  sum -= gameArr[x][y]
-  return sum;
-}
-
-const createNextGenGrid = (gameArr) => {
-  let nextGameArr = gameArr;
-  for(let i = 0; i < gameArr.length; i++){
-    for(let j = 0; j < gameArr[i].length; j++){
-      let cell = gameArr[i][j];
-      let neighbors = calculateNeighbors(gameArr, i, j);
-
-      if(cell === 0 && neighbors === 3) {
-        nextGameArr[i][j] = 1;
-      } else if (cell === 1 && (neighbors < 2 || neighbors > 3)) {
-        nextGameArr[i][j] = 0;
-      } else {
-        nextGameArr[i][j] = cell;
-      }
-    }
-  }
-
-  return nextGameArr;
-}
 
 
 //main component
 class GoL extends Component {
   constructor(props) {
     super(props);
-
+    
     this.state = {
       generation: 0,
       rows: 50,
@@ -72,17 +37,52 @@ class GoL extends Component {
       resolution: 15, //must equal cell height/width
       updated: false,
     }
-      
+    
     //app function bindings
-    this.newRandomGrid = this.newRandomGrid.bind(this);
-    this.newBlankGrid = this.newBlankGrid.bind(this);
-    this.startGame = this.startGame.bind(this);
-    this.stopGame = this.stopGame.bind(this);
-    this.incrementGeneration = this.incrementGeneration.bind(this);
-    this.getCoords = this.getCoords.bind(this);
+    // this.newRandomGrid = this.newRandomGrid.bind(this);
+    // this.newBlankGrid = this.newBlankGrid.bind(this);
+    // this.startGame = this.startGame.bind(this);
+    // this.stopGame = this.stopGame.bind(this);
+    // this.incrementGeneration = this.incrementGeneration.bind(this);
+    // this.getCoords = this.getCoords.bind(this);
   }
-
+  
   /**** app functions ****/
+  //calculates cell neighbors 
+  calculateNeighbors(gameArr, x, y) {
+    let sum = 0;
+    let cols = this.state.cols;
+    let rows = this.state.rows;
+    for (let i = -1; i < 2; i++) {
+      for(let j = -1; j < 2; j++) {
+        let col = (x + i + cols) % cols;
+        let row = (y + j + rows) % rows;
+        sum += gameArr[col][row]
+      }
+    }
+    sum -= gameArr[x][y]
+    return sum;
+  }
+  
+  createNextGenGrid(gameArr) {
+    let nextGameArr = gameArr;
+    for(let i = 0; i < gameArr.length; i++){
+      for(let j = 0; j < gameArr[i].length; j++){
+        let cell = gameArr[i][j];
+        let neighbors = this.calculateNeighbors(gameArr, i, j);
+  
+        if(cell === 0 && neighbors === 3) {
+          nextGameArr[i][j] = 1;
+        } else if (cell === 1 && (neighbors < 2 || neighbors > 3)) {
+          nextGameArr[i][j] = 0;
+        } else {
+          nextGameArr[i][j] = cell;
+        }
+      }
+    }
+  
+    return nextGameArr;
+  }
   //startover with new random board
   newRandomGrid() {
     this.setState( (prevState) => ({
@@ -91,7 +91,7 @@ class GoL extends Component {
       isRunning: false,
     })) 
   }
-
+  
   //startover with blank board
   newBlankGrid() {
     this.setState( (prevState) => ({
@@ -106,7 +106,7 @@ class GoL extends Component {
     if(this.state.updated === false) {
       setTimeout(() => {
         this.setState( (prevState) => ({
-          gameArray: createNextGenGrid(prevState.gameArray),
+          gameArray: this.createNextGenGrid(prevState.gameArray),
           updated: true, 
           generation: prevState.generation += 1,
         })) 
@@ -155,10 +155,6 @@ class GoL extends Component {
       }))
     }
   }
-
-  componentWillUnmount() {
-
-  }
   
   render() { 
     const generation = this.state.generation;
@@ -167,10 +163,15 @@ class GoL extends Component {
       <div className="container">
         <Grid 
           game={this.state.gameArray}
-          running={this.state.isRunning}
         />  
         <Counter generation={generation} />
-        <Controls />
+        <Controls
+          newRandomGrid={this.newRandomGrid.bind(this)}
+          newBlankGrid={this.newBlankGrid.bind(this)}
+          stopGame={this.stopGame.bind(this)}
+          startGame={this.startGame.bind(this)}
+          incrementGeneration={this.incrementGeneration.bind(this)}
+        />
       </div>
     );
   }
@@ -178,20 +179,8 @@ class GoL extends Component {
 
 // does this need state => change into function?
 class Grid extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      rows: 50,
-      cols: 50,
-      gameArray: []
-    }
-  }
-
-  
-
   render() {
-    const game = this.props.gameArray;
+    const game = this.props.game;
     return (
       <div 
         className="grid"  
@@ -211,7 +200,7 @@ class Grid extends Component {
   }
 }
 
-class Box extends Component{
+class Box extends Component {
   render(){
     return (
       <div
@@ -232,25 +221,50 @@ const Counter = (props) => (
   <h2>Generation: {props.generation}</h2>
 )
 
-const Controls = (props) => (
-  <div className="controls">
-    <button onClick={this.newRandomGrid} >
-      Random
-    </button>
-    <button onClick={this.newBlankGrid} >
-      Blank
-    </button>
-    <button onClick={this.incrementGeneration} >
-      Increment
-    </button>
-    <button onClick={this.startGame} >
-      Start
-    </button>
-    <button onClick={this.stopGame} >
-      Stop
-    </button>
-  </div>
-)
+class Controls extends Component {
+  
+  randomGridClick(event) {
+    this.props.newRandomGrid();
+  }
+
+  blankGridClick(event) {
+    this.props.newBlankGrid();
+  }
+
+  incrementClick(event) {
+    this.props.incrementGeneration();
+  }
+  
+  startClick(event) {
+    this.props.startGame();
+  }
+  
+  stopClick(event) {
+    this.props.stopGame();
+  }
+
+  render(){
+    return (
+      <div className="controls">
+        <button onClick={this.randomGridClick.bind(this)} >
+          Random
+        </button>
+        <button onClick={this.blankGridClick.bind(this)} >
+          Blank
+        </button>
+        <button onClick={this.incrementClick.bind(this)} >
+          Increment
+        </button>
+        <button onClick={this.startClick.bind(this)} >
+          Start
+        </button>
+        <button onClick={this.stopClick.bind(this)} >
+          Stop
+        </button>
+      </div>
+    );
+  }
+}
 
 class App extends Component {
   render(){
