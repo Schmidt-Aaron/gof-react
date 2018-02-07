@@ -20,6 +20,10 @@
 }
 
 /* Start Css */
+.container {
+  width: 700px;
+  text-align: center;
+}
 
 .grid {
   line-height: 0;

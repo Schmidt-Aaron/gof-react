@@ -1,6 +1,6 @@
 # game of life TODO list
-1. increment generation function
-1. bind increment to button
+1. fix life equation
+  1. testing calculate neighbors
 1. add running state
 1. optimize
   1. generation loop

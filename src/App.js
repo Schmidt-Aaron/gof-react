@@ -20,8 +20,6 @@ const makeArray = (cols, rows, random) => {
   return arr;
 }
 
-
-
 //main component
 class GoL extends Component {
   constructor(props) {
@@ -37,22 +35,17 @@ class GoL extends Component {
       resolution: 15, //must equal cell height/width
       updated: false,
     }
-    
-    //app function bindings
-    // this.newRandomGrid = this.newRandomGrid.bind(this);
-    // this.newBlankGrid = this.newBlankGrid.bind(this);
-    // this.startGame = this.startGame.bind(this);
-    // this.stopGame = this.stopGame.bind(this);
-    // this.incrementGeneration = this.incrementGeneration.bind(this);
-    // this.getCoords = this.getCoords.bind(this);
+
   }
   
   /**** app functions ****/
   //calculates cell neighbors 
   calculateNeighbors(gameArr, x, y) {
     let sum = 0;
-    let cols = this.state.cols;
-    let rows = this.state.rows;
+    let cols = 50;
+    let rows = 50;
+    // let cols = this.state.cols;
+    // let rows = this.state.rows;
     for (let i = -1; i < 2; i++) {
       for(let j = -1; j < 2; j++) {
         let col = (x + i + cols) % cols;
@@ -73,7 +66,7 @@ class GoL extends Component {
   
         if(cell === 0 && neighbors === 3) {
           nextGameArr[i][j] = 1;
-        } else if (cell === 1 && (neighbors < 2 || neighbors > 3)) {
+        } else if (cell === 1 && (neighbors < 3 || neighbors > 3)) {
           nextGameArr[i][j] = 0;
         } else {
           nextGameArr[i][j] = cell;
@@ -83,6 +76,11 @@ class GoL extends Component {
   
     return nextGameArr;
   }
+
+  toggleLife(num) {
+    return num === 0 ?  num = 1 : num = 0;
+  }
+
   //startover with new random board
   newRandomGrid() {
     this.setState( (prevState) => ({
@@ -114,7 +112,6 @@ class GoL extends Component {
     }
   }
 
-
   startGame(){
     this.setState( (prevState) => ({
       isRunning: true,
@@ -129,13 +126,17 @@ class GoL extends Component {
     }))
   }
 
-  getCoords(e) {
-    console.log('click');
-    // let coords = this.props.index.split('_');
-    // let x = coords[0];
-    // let y = coords[1];
-   // this.props.rowArray[y] = 1;
+  getCoords(id) {
+    let newGameArray = this.state.gameArray;
+    let coords = id.split('_');
+    let x = coords[0];
+    let y = coords[1];
 
+    newGameArray[x][y] = this.toggleLife(newGameArray[x][y])
+    //console.log(this.calculateNeighbors(newGameArray, x, y ))
+    this.setState( (prevState) => ({
+      gameArray: newGameArray
+    }))
   }
 
   
@@ -163,6 +164,7 @@ class GoL extends Component {
       <div className="container">
         <Grid 
           game={this.state.gameArray}
+          getCoords={this.getCoords.bind(this)}
         />  
         <Counter generation={generation} />
         <Controls
@@ -177,8 +179,12 @@ class GoL extends Component {
   }
 } //end main
 
-// does this need state => change into function?
 class Grid extends Component {
+
+  passClick(id) {
+    this.props.getCoords(id);
+  }
+
   render() {
     const game = this.props.game;
     return (
@@ -191,6 +197,8 @@ class Grid extends Component {
           <Box 
             alive={game[i][j]}
             key={`${i}_${j}`}
+            id={`${i}_${j}`}
+            handleClick={this.passClick.bind(this)}
           />
         )    
       )
@@ -201,10 +209,16 @@ class Grid extends Component {
 }
 
 class Box extends Component {
+
+  boxClick(id) {
+    this.props.handleClick(id)
+  }
+
   render(){
     return (
       <div
         className={this.props.alive === 1 ? "box alive" : "box"}
+        onClick={this.boxClick.bind(this, this.props.id)}
       />
 
     );
