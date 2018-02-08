@@ -27,8 +27,8 @@ class GoL extends Component {
     
     this.state = {
       generation: 0,
-      rows: 50,
-      cols: 50,
+      rows: 10,
+      cols: 10,
       gameArray: [],
       isRunning: false,
       speed: 1500,
@@ -57,20 +57,23 @@ class GoL extends Component {
     return sum;
   }
   
-  createNextGenGrid(gameArr) {
-    let nextGameArr = gameArr;
-    for(let i = 0; i < gameArr.length; i++){
-      for(let j = 0; j < gameArr[i].length; j++){
-        let cell = gameArr[i][j];
-        let neighbors = this.calculateNeighbors(gameArr, i, j);
-  
+  createNextGen(gameArr) {
+    const nextGameArr = gameArr;
+    for(let y = 0; y < gameArr.length; y++){
+      for(let x = 0; x < gameArr[y].length; x++){
+        let cell = gameArr[y][x];
+        let neighbors = this.calculateNeighbors(gameArr, y, x);
+        
+        if (neighbors >= 1) {console.log(`cell: ${cell} y:${y} x:${x} neighb: ${neighbors}`)}
+        
         if(cell === 0 && neighbors === 3) {
-          nextGameArr[i][j] = 1;
-        } else if (cell === 1 && (neighbors < 2 || neighbors > 3)) {
-          nextGameArr[i][j] = 0;
-        } else {
-          nextGameArr[i][j] = cell;
-        }
+          console.log(`y:${y} x:${x}`)
+          nextGameArr[y][x] = 1;
+        } //else if (cell === 1 && (neighbors < 2 || neighbors > 3)) {
+        //   nextGameArr[y][x] = 0;
+        // } else {
+        //   nextGameArr[y][x] = cell;
+        // }
       }
     }
   
@@ -80,7 +83,21 @@ class GoL extends Component {
   toggleLife(num) {
     return num === 0 ?  num = 1 : num = 0;
   }
+  
+  getCoords(id) {
+    let newGameArray = this.state.gameArray;
+    let coords = id.split('_');
+    let y = +coords[0];
+    let x = +coords[1];
+    //console.log(`y:${y} x:${x}`)
+    // newGameArray[x][y] = this.toggleLife(newGameArray[y][x])
+    // //console.log(this.calculateNeighbors(newGameArray, y, x ))
+    // this.setState( (prevState) => ({
+    //   gameArray: newGameArray
+    // }))
 
+    console.log( this.calculateNeighbors(newGameArray, y, x))
+  }
   //startover with new random board
   newRandomGrid() {
     this.setState( (prevState) => ({
@@ -92,8 +109,12 @@ class GoL extends Component {
   
   //startover with blank board
   newBlankGrid() {
+    let blankArr = makeArray(this.state.cols, this.state.rows, false)
+    blankArr[0][1] = 1; 
+    blankArr[1][1] = 1; 
+    blankArr[2][1] = 1; 
     this.setState( (prevState) => ({
-      gameArray: makeArray(this.state.cols, this.state.rows, false),
+      gameArray: blankArr,
       generation: 0,
       isRunning: false,
     })) 
@@ -101,15 +122,18 @@ class GoL extends Component {
 
   // increases generation
   incrementGeneration() {
-    if(this.state.updated === false) {
-      setTimeout(() => {
-        this.setState( (prevState) => ({
-          gameArray: this.createNextGenGrid(prevState.gameArray),
-          updated: true, 
-          generation: prevState.generation += 1,
-        })) 
-      }, 200)
-    }
+    let nextGameArr = this.createNextGen(this.state.gameArray);
+    
+    this.setState( (prevState) => ({
+      gameArray: nextGameArr,
+      updated: true, 
+      generation: prevState.generation += 1,
+    })) 
+
+    // if(this.state.updated === false) {
+    //   setTimeout(() => {
+    //   }, 200)
+    // }
   }
 
   startGame(){
@@ -126,19 +150,6 @@ class GoL extends Component {
     }))
   }
 
-  getCoords(id) {
-    let newGameArray = this.state.gameArray;
-    let coords = id.split('_');
-    let x = +coords[0];
-    let y = +coords[1];
-    newGameArray[x][y] = this.toggleLife(newGameArray[x][y])
-    //console.log(this.calculateNeighbors(newGameArray, x, y ))
-    this.setState( (prevState) => ({
-      gameArray: newGameArray
-    }))
-
-    console.log( this.calculateNeighbors(newGameArray, x, y))
-  }
 
   
   componentDidUpdate() {
@@ -152,9 +163,7 @@ class GoL extends Component {
   componentWillMount() {
     //creates initial grid
     if(this.state.gameArray.length === 0 ) {
-      this.setState( (prevState) => ({
-        gameArray: makeArray(this.state.cols, this.state.rows, false),
-      }))
+      this.newBlankGrid();
     }
   }
   

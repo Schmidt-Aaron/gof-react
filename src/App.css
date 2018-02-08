@@ -21,7 +21,7 @@
 
 /* Start Css */
 .container {
-  width: 700px;
+  width: 150px; /* 15* rows || cols */
   text-align: center;
 }
 
