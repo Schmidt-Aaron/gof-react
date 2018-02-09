@@ -63,17 +63,18 @@ class GoL extends Component {
       for(let x = 0; x < gameArr[y].length; x++){
         let cell = gameArr[y][x];
         let neighbors = this.calculateNeighbors(gameArr, y, x);
-        
-        if (neighbors >= 1) {console.log(`cell: ${cell} y:${y} x:${x} neighb: ${neighbors}`)}
-        
+        //console.log(cell)
+
+        if (neighbors === 3) {console.log(`cell: ${cell} y:${y} x:${x} neighb: ${neighbors}`)}
+        //if(cell === 1) {console.log(`y:${y} x:${x}`)}
         if(cell === 0 && neighbors === 3) {
           console.log(`y:${y} x:${x}`)
           nextGameArr[y][x] = 1;
-        } //else if (cell === 1 && (neighbors < 2 || neighbors > 3)) {
-        //   nextGameArr[y][x] = 0;
-        // } else {
-        //   nextGameArr[y][x] = cell;
-        // }
+        } else if (cell === 1 && (neighbors < 2 || neighbors > 3)) {
+          nextGameArr[y][x] = 0;
+        } else {
+          nextGameArr[y][x] = cell;
+        }
       }
     }
   
@@ -89,12 +90,12 @@ class GoL extends Component {
     let coords = id.split('_');
     let y = +coords[0];
     let x = +coords[1];
-    //console.log(`y:${y} x:${x}`)
-    // newGameArray[x][y] = this.toggleLife(newGameArray[y][x])
-    // //console.log(this.calculateNeighbors(newGameArray, y, x ))
-    // this.setState( (prevState) => ({
-    //   gameArray: newGameArray
-    // }))
+    console.log(`y:${y} x:${x}`)
+    newGameArray[y][x] = this.toggleLife(newGameArray[y][x])
+    //console.log(this.calculateNeighbors(newGameArray, y, x ))
+    this.setState( (prevState) => ({
+      gameArray: newGameArray
+    }))
 
     console.log( this.calculateNeighbors(newGameArray, y, x))
   }
