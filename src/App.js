@@ -40,7 +40,7 @@ class GoL extends Component {
   
   /**** app functions ****/
   //calculates cell neighbors 
-  calculateNeighbors(gameArr, y, x) {
+  calculateNeighbors(game, y, x) {
     let sum = 0;
     let cols = this.state.cols;
     let rows = this.state.rows;
@@ -49,36 +49,40 @@ class GoL extends Component {
       for(let j = -1; j < 2; j++) {
         let col = (y + i + cols) % cols;
         let row = (x + j + rows) % rows;
-        sum += gameArr[col][row]
+        sum += game[col][row]
       }
     }
     
-    sum -= gameArr[y][x]
+    sum -= game[y][x]
     return sum;
   }
   
-  createNextGen(gameArr) {
-    const nextGameArr = gameArr;
-    for(let y = 0; y < gameArr.length; y++){
-      for(let x = 0; x < gameArr[y].length; x++){
-        let cell = gameArr[y][x];
-        let neighbors = this.calculateNeighbors(gameArr, y, x);
-        //console.log(cell)
+  createNextGen(game) {
+    console.log('create next gen');
+    let nextGame = [];
+    console.log(` next game arr is ${nextGame}`)
 
-        if (neighbors === 3) {console.log(`cell: ${cell} y:${y} x:${x} neighb: ${neighbors}`)}
-        //if(cell === 1) {console.log(`y:${y} x:${x}`)}
-        if(cell === 0 && neighbors === 3) {
-          console.log(`y:${y} x:${x}`)
-          nextGameArr[y][x] = 1;
+    for(let y = 0; y < game.length; y++){
+      for(let x = 0; x < game[y].length; x++){
+        let cell = game[y][x];
+        let neighbors = this.calculateNeighbors(game, y, x);
+        console.log(`y:${y} x:${x} cell value: ${cell} neighb: ${neighbors}`)
+        //if (neighbors >= 1) {console.log(`cell: ${cell} y:${y} x:${x} neighb: ${neighbors}`)}
+        
+        //console.log(neighbors);
+         if(cell === 0 && neighbors === 3) {
+          //console.log(`y:${y} x:${x} val = 1`)
+          nextGame[y][x] = 1; 
         } else if (cell === 1 && (neighbors < 2 || neighbors > 3)) {
-          nextGameArr[y][x] = 0;
+          //nextGameArr[y][x] = 0;
+          //console.log(`y:${y} x:${x} val = 0`)
         } else {
-          nextGameArr[y][x] = cell;
+          //nextGameArr[y][x] = cell;
+          //console.log(`y:${y} x:${x} is unchanged`)
         }
       }
     }
-  
-    return nextGameArr;
+    return game;
   }
 
   toggleLife(num) {
@@ -87,15 +91,16 @@ class GoL extends Component {
   
   getCoords(id) {
     let newGameArray = this.state.gameArray;
+    console.log(newGameArray);
     let coords = id.split('_');
     let y = +coords[0];
     let x = +coords[1];
     console.log(`y:${y} x:${x}`)
-    newGameArray[y][x] = this.toggleLife(newGameArray[y][x])
+    // newGameArray[x][y] = this.toggleLife(newGameArray[y][x])
     //console.log(this.calculateNeighbors(newGameArray, y, x ))
-    this.setState( (prevState) => ({
-      gameArray: newGameArray
-    }))
+    // this.setState( (prevState) => ({
+    //   gameArray: newGameArray
+    // }))
 
     console.log( this.calculateNeighbors(newGameArray, y, x))
   }
@@ -123,8 +128,9 @@ class GoL extends Component {
 
   // increases generation
   incrementGeneration() {
-    let nextGameArr = this.createNextGen(this.state.gameArray);
-    
+    let gameArr = this.state.gameArray;
+    let nextGameArr = this.createNextGen(gameArr);
+    console.log(` new game array = ${nextGameArr}`)
     this.setState( (prevState) => ({
       gameArray: nextGameArr,
       updated: true, 
@@ -154,11 +160,11 @@ class GoL extends Component {
 
   
   componentDidUpdate() {
-    if(this.state.updated === true ) {
-      this.setState( (prevState) => ({
-        updated: false,
-      }))
-    }
+    // if(this.state.updated === true ) {
+    //   this.setState( (prevState) => ({
+    //     updated: false,
+    //   }))
+    // }
   }
 
   componentWillMount() {
@@ -184,7 +190,7 @@ class GoL extends Component {
           stopGame={this.stopGame.bind(this)}
           startGame={this.startGame.bind(this)}
           incrementGeneration={this.incrementGeneration.bind(this)}
-        />
+        />  
       </div>
     );
   }
